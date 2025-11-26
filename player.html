@@ -400,7 +400,8 @@
       aspect-ratio: 16/9;
       user-select: none;
       -webkit-user-select: none;
-      display: none;
+      display: block; /* Changed from 'none' to 'block' */
+      margin-bottom: 20px;
     }
 
     /* Mobile adjustments */
@@ -1204,70 +1205,6 @@
       display: none;
     }
 
-    /* Attend Now Button */
-    .attend-now-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 14px;
-      margin: 2rem 0;
-      border: 1px solid var(--muted-2);
-    }
-    .attend-now-btn {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 100%);
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(49, 130, 206, 0.4);
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin: 1rem 0;
-    }
-    .attend-now-btn:disabled {
-      background: linear-gradient(135deg, #333 0%, #555 100%);
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-    .attend-now-btn:disabled:hover {
-      transform: none;
-      box-shadow: none;
-    }
-    .attend-now-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(49, 130, 206, 0.6);
-    }
-    .attend-now-btn:active:not(:disabled) {
-      transform: translateY(0);
-    }
-    .attend-now-btn i {
-      font-size: 1.4rem;
-    }
-
-    /* Loading spinner */
-    .btn-loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     /* Browser Warning */
     .browser-warning {
       display: none;
@@ -1439,18 +1376,7 @@
       </div>
     </div>
 
-    <!-- Attend Now Container -->
-    <div class="attend-now-container" id="attendNowContainer">
-      <h3>Ready to Start Learning?</h3>
-      <p id="attendNowMessage">Preparing video content...</p>
-      <button class="attend-now-btn" id="attendNowBtn" disabled>
-        <span class="btn-loading"></span>
-        Loading Video...
-      </button>
-      <p><small>Note: The lesson will open in fullscreen mode for the best learning experience</small></p>
-    </div>
-
-    <!-- Custom Player (Hidden by default) -->
+    <!-- Custom Player (Displayed by default) -->
     <div class="player-shell" id="playerShell" aria-label="video player">
       <!-- Loading overlay to hide video content -->
       <div id="loadingOverlay" class="loading-overlay"></div>
@@ -1617,7 +1543,6 @@
     // Check browser on page load
     if (!isSupportedBrowser()) {
       document.getElementById('browserWarning').classList.add('active');
-      document.getElementById('attendNowContainer').style.display = 'none';
       document.getElementById('lessonInfo').style.display = 'none';
     }
 
@@ -1952,16 +1877,6 @@
       }
     }
 
-    // Enable Attend Now button
-    function enableAttendNowButton() {
-      const attendNowBtn = $('#attendNowBtn');
-      const attendNowMessage = $('#attendNowMessage');
-      state.videoLoaded = true;
-      attendNowBtn.disabled = false;
-      attendNowBtn.innerHTML = '<i class="bx bx-play-circle"></i> Attend Now';
-      attendNowMessage.textContent = 'Click the button below to begin the lesson in fullscreen mode';
-    }
-
     // Initialize header functionality
     function initHeader(){
       const burger = $('.hamburger');
@@ -2247,12 +2162,6 @@
               console.error('Orientation unlock API not available:', e);
             }
           }
-          
-          if (state.player) {
-            state.player.pauseVideo();
-          }
-          document.getElementById('playerShell').style.display = 'none';
-          document.getElementById('attendNowContainer').style.display = 'flex';
         } else {
           fsBtn.innerHTML = '<i class="bx bx-exit-fullscreen"></i><span>Exit</span>';
         }
@@ -2482,7 +2391,6 @@
         },
         events: {
           onReady: (e) => {
-            enableAttendNowButton();
             try {
               state.player.setPlaybackQuality('hd1080');
             } catch (e) {
@@ -2619,35 +2527,6 @@
         window.history.back();
       });
 
-      // Attend Now button
-      $('#attendNowBtn').addEventListener('click', () => {
-        if (!isSupportedBrowser()) {
-          alert('Please use a supported browser (Chrome, Edge, Firefox, or Safari) to access this content.');
-          return;
-        }
-        
-        if (!state.videoLoaded) {
-          alert('Video is still loading. Please wait...');
-          return;
-        }
-        
-        $('#playerShell').style.display = 'block';
-        $('#attendNowContainer').style.display = 'none';
-        
-        const shell = $('#playerShell');
-        if (shell.requestFullscreen) {
-          shell.requestFullscreen();
-        } else if (shell.webkitRequestFullscreen) {
-          shell.webkitRequestFullscreen();
-        } else if (shell.msRequestFullscreen) {
-          shell.msRequestFullscreen();
-        }
-        
-        if (state.player) {
-          state.player.playVideo();
-        }
-      });
-
       try {
         // Load data from Google Sheets
         console.log('Loading data from Google Sheets...');
@@ -2712,9 +2591,6 @@
 
     document.addEventListener('fullscreenchange', function() {
       adjustVideoCrop();
-      if (!document.fullscreenElement && state.player) {
-        state.player.pauseVideo();
-      }
     });
 
     // Initialize
