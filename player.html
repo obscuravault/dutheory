@@ -22,6 +22,15 @@
       padding: 20px;
       backdrop-filter: blur(10px);
       animation: fadeIn 0.3s ease-out;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .terms-popup.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
     
     @keyframes fadeIn {
@@ -139,6 +148,15 @@
       box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
       animation: slideInLeft 0.5s ease-out;
       backdrop-filter: blur(10px);
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .accepted-indicator.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
     
     @keyframes slideInLeft {
@@ -478,39 +496,47 @@
     function showTermsPopup() {
       const hasAccepted = localStorage.getItem('obscuraVaultTermsAccepted');
       if (!hasAccepted) {
+        console.log('Showing terms popup - no acceptance found in localStorage');
         setTimeout(() => {
           const popup = document.getElementById('termsPopup');
           if (popup) {
+            console.log('Removing hidden class from terms popup');
             popup.classList.remove('hidden');
           }
         }, 1000);
+      } else {
+        console.log('Terms already accepted:', hasAccepted);
       }
     }
 
     function acceptTerms() {
+      console.log('Accepting terms...');
       localStorage.setItem('obscuraVaultTermsAccepted', 'true');
       localStorage.setItem('obscuraVaultTermsAcceptedDate', new Date().toISOString());
       
       const popup = document.getElementById('termsPopup');
       if (popup) {
         popup.classList.add('hidden');
+        console.log('Terms popup hidden');
       }
       
       // Show accepted indicator
       const indicator = document.getElementById('acceptedIndicator');
       if (indicator) {
         indicator.classList.remove('hidden');
+        console.log('Accepted indicator shown');
         setTimeout(() => {
           indicator.classList.add('hidden');
+          console.log('Accepted indicator hidden');
         }, 5000);
       }
     }
 
     function declineTerms() {
-      // Redirect to home page or show message
+      console.log('Terms declined');
+      // Redirect to home page
       alert('You must accept the Terms and Conditions to use this website.');
-      // Optionally redirect to home
-      // window.location.href = 'index.html';
+      window.location.href = 'index.html';
     }
 
     // Check for valid rid parameter
