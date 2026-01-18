@@ -8,34 +8,73 @@
   <link rel="icon" href="https://yt3.ggpht.com/dvET-k1ACs8PRAd9xldf31l6o93UOpyDH9IVa7DSSOWQxGMX-KaFD0ffB6SCr5Z8rmMrn3O2jA=s800-c-k-c0x00ffffff-no-rj" type="image/svg+xml">
 
   <style>
-    /* Existing CSS styles remain the same... */
+    /* Existing CSS styles remain the same up to line 662... */
 
-    /* Terms & Conditions Popup Styles */
+    /* Security Lock */
+    .lock {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,0.85);
+      z-index: 999999;
+      padding: 2rem;
+      transition: opacity 0.15s ease;
+    }
+    .lock.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .lock-card {
+      background: var(--muted);
+      border: 1px solid var(--muted-2);
+      border-radius: 18px;
+      padding: 26px;
+      width: min(520px, 90vw);
+      text-align: center;
+      color: var(--ink);
+    }
+    .lock-card h2 {
+      margin: 0 0 .4rem;
+      color: var(--error);
+      font-size: 1.4rem;
+    }
+    .lock-card small {
+      opacity: .8;
+    }
+    .lock-card .btn {
+      display: inline-block;
+      padding: .6rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--muted-2);
+      background: var(--accent);
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: .85rem;
+      cursor: pointer;
+    }
+
+    /* Terms & Conditions Popup - NEW STYLES */
     .terms-popup {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.95);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       padding: 20px;
       backdrop-filter: blur(10px);
-      animation: fadeIn 0.3s ease-out;
       opacity: 1;
       visibility: visible;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     
-    .terms-popup.hidden {
+    .terms-popup.terms-hidden {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
     
     .terms-content {
@@ -47,6 +86,7 @@
       border: 1px solid var(--muted-2);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
       animation: slideUp 0.4s ease-out;
+      position: relative;
     }
     
     @keyframes slideUp {
@@ -72,6 +112,17 @@
       line-height: 1.6;
       margin-bottom: 25px;
       font-size: 15px;
+    }
+    
+    .terms-content ul {
+      color: var(--ink-60);
+      margin-left: 20px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .terms-content ul li {
+      margin-bottom: 8px;
     }
     
     .terms-buttons {
@@ -146,14 +197,13 @@
       gap: 8px;
       z-index: 999;
       box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-      animation: slideInLeft 0.5s ease-out;
       backdrop-filter: blur(10px);
       opacity: 1;
       visibility: visible;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     
-    .accepted-indicator.hidden {
+    .accepted-indicator.indicator-hidden {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -202,7 +252,14 @@
       }
     }
     
-    /* Existing CSS continues... */
+    /* Player Styles - Existing CSS continues... */
+    .player-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    /* ... rest of existing CSS remains unchanged ... */
   </style>
 </head>
 <body class="no-js">
@@ -213,11 +270,11 @@
   </div>
 
   <!-- Terms & Conditions Popup -->
-  <div id="termsPopup" class="terms-popup hidden">
+  <div id="termsPopup" class="terms-popup terms-hidden">
     <div class="terms-content">
       <h2>Welcome to Obscura Vault</h2>
       <p>By using this website, you agree to our Terms and Conditions. This includes:</p>
-      <ul style="color: var(--ink-60); margin-left: 20px; margin-bottom: 20px; font-size: 14px;">
+      <ul>
         <li>Content is for educational purposes only</li>
         <li>Respect intellectual property rights</li>
         <li>No unauthorized distribution of content</li>
@@ -238,7 +295,7 @@
   </div>
 
   <!-- Accepted Indicator -->
-  <div id="acceptedIndicator" class="accepted-indicator hidden">
+  <div id="acceptedIndicator" class="accepted-indicator indicator-hidden">
     <i class='bx bx-check-circle'></i>
     <span>Terms & Conditions Accepted</span>
   </div>
@@ -500,8 +557,8 @@
         setTimeout(() => {
           const popup = document.getElementById('termsPopup');
           if (popup) {
-            console.log('Removing hidden class from terms popup');
-            popup.classList.remove('hidden');
+            console.log('Removing terms-hidden class from terms popup');
+            popup.classList.remove('terms-hidden');
           }
         }, 1000);
       } else {
@@ -516,17 +573,18 @@
       
       const popup = document.getElementById('termsPopup');
       if (popup) {
-        popup.classList.add('hidden');
+        popup.classList.add('terms-hidden');
         console.log('Terms popup hidden');
       }
       
       // Show accepted indicator
       const indicator = document.getElementById('acceptedIndicator');
       if (indicator) {
-        indicator.classList.remove('hidden');
+        indicator.classList.remove('indicator-hidden');
+        indicator.style.animation = 'slideInLeft 0.5s ease-out';
         console.log('Accepted indicator shown');
         setTimeout(() => {
-          indicator.classList.add('hidden');
+          indicator.classList.add('indicator-hidden');
           console.log('Accepted indicator hidden');
         }, 5000);
       }
@@ -1714,7 +1772,9 @@
     window.addEventListener('load', function() {
       // Only show if valid rid parameter exists
       if (checkRIDParameter()) {
-        showTermsPopup();
+        setTimeout(() => {
+          showTermsPopup();
+        }, 500);
       }
     });
 
